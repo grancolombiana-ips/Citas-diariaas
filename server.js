@@ -5,7 +5,7 @@ const port = process.env.PORT || 3030;
 const dir = process.cwd();
 
 http.createServer((req, res) => {
-  let file = req.url === '/' ? '/index.html.html' : req.url;
+  let file = req.url === '/' ? '/index.html' : req.url;
   const fp = path.join(dir, file);
   fs.readFile(fp, (err, data) => {
     if (err) { res.writeHead(404); res.end('Not found: ' + fp); return; }
