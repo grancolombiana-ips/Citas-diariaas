@@ -719,6 +719,7 @@ function toggleAudio() {
     btn.style.background = audioEnabled ? 'rgba(0,194,224,0.2)' : 'rgba(255,255,255,0.07)';
   }
   if (!audioEnabled) window.speechSynthesis && window.speechSynthesis.cancel();
+  render();
 }
 
 function speak(text, onEnd) {
@@ -889,6 +890,7 @@ function render() {
 }
 
 function audioBtn(text) {
+  if (!audioEnabled) return '';
   return `<button class="audio-btn" onclick="speak('${text.replace(/'/g,"\\'")}')">
     <span class="dot"></span> Escuchar pregunta
   </button>`;
@@ -900,9 +902,7 @@ function renderStep0(app) {
     <div class="card">
       <div style="display:flex;gap:10px;margin-bottom:20px;">
         ${audioBtn(q)}
-        <button class="audio-btn" id="micBtn" onclick="activateMic(0)">
-          <span class="dot"></span> 🎤 Hablar
-        </button>
+        ${audioEnabled ? `<button class="audio-btn" id="micBtn" onclick="activateMic(0)"><span class="dot"></span> 🎤 Hablar</button>` : ''}
       </div>
       <div class="step-label">Pregunta 1 de 3</div>
       <div class="question">${q}</div>
@@ -960,9 +960,7 @@ function renderStep1(app) {
     <div class="card">
       <div style="display:flex;gap:10px;margin-bottom:20px;">
         ${audioBtn(q)}
-        <button class="audio-btn" id="micBtn" onclick="activateMic(1)">
-          <span class="dot"></span> 🎤 Hablar
-        </button>
+        ${audioEnabled ? `<button class="audio-btn" id="micBtn" onclick="activateMic(1)"><span class="dot"></span> 🎤 Hablar</button>` : ''}
       </div>
       <div class="step-label">Pregunta 2 de 3</div>
       <div class="question">${q}</div>
@@ -987,9 +985,7 @@ function renderStep2(app) {
     <div class="card">
       <div style="display:flex;gap:10px;margin-bottom:20px;">
         ${audioBtn(q)}
-        <button class="audio-btn" id="micBtn" onclick="activateMic(2)">
-          <span class="dot"></span> 🎤 Hablar
-        </button>
+        ${audioEnabled ? `<button class="audio-btn" id="micBtn" onclick="activateMic(2)"><span class="dot"></span> 🎤 Hablar</button>` : ''}
       </div>
       <div class="step-label">Pregunta 3 de 3</div>
       <div class="question">${q}</div>
