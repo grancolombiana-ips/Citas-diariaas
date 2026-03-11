@@ -1290,18 +1290,40 @@ function renderResults(app) {
         </div>
 
         <div class="results-title">Exámenes Requeridos</div>
-        <div style="margin-bottom:10px;padding:10px;background:#f0f0f0;border-radius:8px;font-size:0.85rem;color:#555;text-align:center;" id="exams-hint">
-          📋 Envía tus datos primero, luego podrás marcar cada examen completado.
-        </div>
         <div class="exam-grid" id="exam-grid-container">${examHtml}</div>
-        <div style="margin-top:16px;font-family:'Rajdhani',sans-serif;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:6px;">PASO 1</div>
-        <button id="pdf-btn" onclick="generarPDF()" style="display:block;width:100%;padding:14px;border-radius:10px;border:2px solid #111111;background:#111111;color:#ffffff;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
-          📄 Descargar PDF con exámenes
-        </button>
 
         ${alertHtml}
 
+        <!-- Formulario datos -->
+        <div style="margin-top:24px;background:#f7f7f7;border:1px solid rgba(0,0,0,0.12);border-radius:14px;padding:24px;" id="datos-form-block">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:#111;margin-bottom:16px;">👤 Sus Datos</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Nombre completo</label>
+              <input id="res_nombre" type="text" placeholder="Ej: Juan Pérez García"
+                style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            </div>
+            <div>
+              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Documento de identidad</label>
+              <input id="res_doc" type="text" placeholder="Ej: 80123456"
+                style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            </div>
+            <div>
+              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Celular</label>
+              <input id="res_cel" type="tel" placeholder="Ej: 3001234567"
+                style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            </div>
+            <button onclick="guardarDatosResultados()" style="width:100%;padding:12px;border-radius:10px;background:#111111;color:#ffffff;border:none;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">
+              Guardar datos →
+            </button>
+          </div>
+        </div>
+
         <!-- Bloque informativo IPS -->
+        <div id="exams-hint" style="display:none;"></div>
         <div style="margin-top:28px;background:rgba(0,194,224,0.05);border:1px solid rgba(0,194,224,0.2);border-radius:14px;padding:24px;">
           <div style="font-family:'Rajdhani',sans-serif;font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;">📍 Información de Atención</div>
 
@@ -1394,6 +1416,25 @@ function restart() {
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
+
+
+function guardarDatosResultados() {
+  const nombre = document.getElementById('res_nombre')?.value.trim();
+  const doc    = document.getElementById('res_doc')?.value.trim();
+  const cel    = document.getElementById('res_cel')?.value.trim();
+  if (!nombre || !doc || !cel) {
+    alert('Por favor completa todos los datos.');
+    return;
+  }
+  state.nombre    = nombre;
+  state.documento = doc;
+  state.celular   = cel;
+  datosEnviados   = true;
+
+  // Hide form, show confirmation
+  const block = document.getElementById('datos-form-block');
+  if (block) block.innerHTML = '<div style="text-align:center;padding:12px;background:#111;color:#fff;border-radius:10px;font-family:Rajdhani,sans-serif;font-weight:700;font-size:1rem;">✅ Datos enviados — ahora marca tus exámenes</div>';
+}
 
 function agendarCita() {
   document.getElementById('fecha-cita-wrap').style.display = 'block';
