@@ -485,6 +485,7 @@ const state = {
   step: 0,
   licencia: null,
   primeraVez: null,
+  vencido: false,
   edad: null
 };
 
@@ -511,7 +512,7 @@ const EXAMS = {
   rayosx:       { icon: '🩻', name: 'Rayos X de Tórax', note: 'Solo primera vez' },
 };
 
-function getExams(licencia, primeraVez, edad) {
+function getExams(licencia, primeraVez, edad, vencido) {
   let lista = [];
   const alerts = [];
   const lic = licencia;
@@ -529,6 +530,11 @@ function getExams(licencia, primeraVez, edad) {
       lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
       if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+      if (vencido) {
+        alerts.push({ type: 'warning', text: '📋 Certificado vencido > 2 años: se realizan todos los exámenes de primera vez. Las pruebas psicológicas son realizadas por Grancolombiana IPS.' });
+      } else {
+        alerts.push({ type: 'warning', text: '📋 Las pruebas psicológicas de primera vez deben ser subidas al SIGA por el respectivo Centro de Instrucción.' });
+      }
     }
 
     // Renovación por edad
@@ -566,6 +572,11 @@ function getExams(licencia, primeraVez, edad) {
       lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
       if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+      if (vencido) {
+        alerts.push({ type: 'warning', text: '📋 Certificado vencido > 2 años: se realizan todos los exámenes de primera vez. Las pruebas psicológicas son realizadas por Grancolombiana IPS.' });
+      } else {
+        alerts.push({ type: 'warning', text: '📋 Las pruebas psicológicas de primera vez deben ser subidas al SIGA por el respectivo Centro de Instrucción.' });
+      }
     }
 
     if (!pv) {
@@ -603,6 +614,11 @@ function getExams(licencia, primeraVez, edad) {
       lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
       if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+      if (vencido) {
+        alerts.push({ type: 'warning', text: '📋 Certificado vencido > 2 años: se realizan todos los exámenes de primera vez. Las pruebas psicológicas son realizadas por Grancolombiana IPS.' });
+      } else {
+        alerts.push({ type: 'warning', text: '📋 Las pruebas psicológicas de primera vez deben ser subidas al SIGA por el respectivo Centro de Instrucción.' });
+      }
     }
 
     if (!pv) {
@@ -637,6 +653,11 @@ function getExams(licencia, primeraVez, edad) {
       lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
       if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+      if (vencido) {
+        alerts.push({ type: 'warning', text: '📋 Certificado vencido > 2 años: se realizan todos los exámenes de primera vez. Las pruebas psicológicas son realizadas por Grancolombiana IPS.' });
+      } else {
+        alerts.push({ type: 'warning', text: '📋 Las pruebas psicológicas de primera vez deben ser subidas al SIGA por el respectivo Centro de Instrucción.' });
+      }
     }
 
     if (!pv) {
@@ -694,6 +715,11 @@ function getExams(licencia, primeraVez, edad) {
       lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
       if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+      if (vencido) {
+        alerts.push({ type: 'warning', text: '📋 Certificado vencido > 2 años: se realizan todos los exámenes de primera vez. Las pruebas psicológicas son realizadas por Grancolombiana IPS.' });
+      } else {
+        alerts.push({ type: 'warning', text: '📋 Las pruebas psicológicas de primera vez deben ser subidas al SIGA por el respectivo Centro de Instrucción.' });
+      }
     }
 
     if (!pv) {
@@ -1027,7 +1053,7 @@ function renderStep0(app) {
 }
 
 function renderStep1(app) {
-  const q = '¿Es la primera vez que solicita el certificado médico aeronáutico?';
+  const q = '¿Cuál es el tipo de solicitud?';
   app.innerHTML = `
     <div class="card">
       <div style="display:flex;gap:10px;margin-bottom:20px;">
@@ -1036,19 +1062,38 @@ function renderStep1(app) {
       </div>
       <div class="step-label">Pregunta 2 de 3</div>
       <div class="question">${q}</div>
-      <div class="options two-col">
-        <button class="option-btn" onclick="select('primeraVez', true)">
-          <span class="option-title">✅ Sí</span>
-          <span class="option-desc">Primera solicitud</span>
+      <div class="options">
+        <button class="option-btn" onclick="selectTipo('primera')">
+          <span class="option-title">✅ Primera vez</span>
+          <span class="option-desc">Primera solicitud del certificado médico aeronáutico</span>
         </button>
-        <button class="option-btn" onclick="select('primeraVez', false)">
-          <span class="option-title">🔄 No</span>
-          <span class="option-desc">Renovación</span>
+        <button class="option-btn" onclick="selectTipo('renovacion')">
+          <span class="option-title">🔄 Renovación</span>
+          <span class="option-desc">Certificado vigente o vencido menos de 2 años</span>
+        </button>
+        <button class="option-btn" onclick="selectTipo('vencido')">
+          <span class="option-title">⚠️ Certificado vencido &gt; 2 años</span>
+          <span class="option-desc">Se realizan todos los exámenes como primera vez</span>
         </button>
       </div>
       <div id="voiceStatus" style="margin-top:12px;font-size:0.82rem;color:var(--gray);min-height:20px;"></div>
     </div>`;
   speak(q, () => setTimeout(() => startListeningForStep(1), 400));
+}
+
+function selectTipo(tipo) {
+  if (tipo === 'primera') {
+    state.primeraVez = true;
+    state.vencido = false;
+  } else if (tipo === 'vencido') {
+    state.primeraVez = true;
+    state.vencido = true;
+  } else {
+    state.primeraVez = false;
+    state.vencido = false;
+  }
+  state.step++;
+  render();
 }
 
 function renderStep2(app) {
@@ -1087,7 +1132,7 @@ function confirmAge() {
 
 
 function renderResults(app) {
-  const { lista, alerts } = getExams(state.licencia, state.primeraVez, state.edad);
+  const { lista, alerts } = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
 
   const licNames = {
     'clase1':        'Clase 1 — PCA · PCH · PTL · IDV',
@@ -1138,7 +1183,7 @@ function renderResults(app) {
           </div>
           <div class="summary-item">
             <span class="summary-label">Solicitud</span>
-            <span class="summary-value">${state.primeraVez ? 'Primera vez' : 'Renovación'}</span>
+            <span class="summary-value">${state.vencido ? 'Vencido > 2 años' : state.primeraVez ? 'Primera vez' : 'Renovación'}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">Edad</span>
