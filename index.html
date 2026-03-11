@@ -1385,7 +1385,7 @@ function guardarDatosResultados() {
 
   // Hide form, show confirmation
   const block = document.getElementById('datos-form-block');
-  if (block) block.innerHTML = '<div style="text-align:center;padding:12px;background:#111;color:#fff;border-radius:10px;font-family:Rajdhani,sans-serif;font-weight:700;font-size:1rem;">✅ Datos enviados — ahora marca tus exámenes</div>';
+  if (block) block.style.display = 'none';
 }
 
 function agendarCita() {
@@ -1438,14 +1438,6 @@ function enviarCita() {
     `🏥 *Licencia:* ${state.licencia || '-'}\n` +
     `🎂 *Edad:* ${state.edad || '-'} años`;
 
-  // datosEnviados already set in confirmarDatos
-  const enviarBtn = document.querySelector('button[onclick="enviarCita()"]');
-  if (enviarBtn) {
-    enviarBtn.textContent = '✅ Datos enviados — ahora marca tus exámenes';
-    enviarBtn.style.background = '#111111';
-    enviarBtn.style.color = '#ffffff';
-    enviarBtn.disabled = true;
-  }
   window.open('https://wa.me/573012271729?text=' + encodeURIComponent(msg), '_blank');
 }
 
