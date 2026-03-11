@@ -1419,7 +1419,7 @@ function enviarCita() {
 
   // 1. Guardar en Google Sheets y enviar correo
   if (SHEET_URL && SHEET_URL !== 'PEGA_AQUI_TU_URL') {
-    const exams = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
+    const { lista: exams } = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
     const payload = {
       nombre:     nombre,
       documento:  doc,
