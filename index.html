@@ -499,7 +499,7 @@
     <div class="step-dot" id="dot1"></div>
     <div class="step-dot" id="dot2"></div>
     <div class="step-dot" id="dot3"></div>
-    <div class="step-dot" id="dot4"></div>
+
   </div>
 
   <div id="app"></div>
@@ -1013,8 +1013,7 @@ function render() {
   if (state.step === 0) renderStep0(app);
   else if (state.step === 1) renderStep1(app);
   else if (state.step === 2) renderStep2(app);
-  else if (state.step === 3) renderStep3(app);
-  else if (state.step === 4) renderResults(app);
+  else if (state.step === 3) renderResults(app);
 }
 
 function audioBtn(text) {
@@ -1160,53 +1159,6 @@ function confirmAge() {
   render();
 }
 
-
-function renderStep3(app) {
-  app.innerHTML = `
-    <div class="card">
-      <div class="step-label">Paso 4 de 4 — Sus Datos</div>
-      <div class="question">Ingrese sus datos personales</div>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div>
-          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Nombre completo</label>
-          <input id="step3_nombre" type="text" placeholder="Ej: Juan Pérez García"
-            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
-        </div>
-        <div>
-          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Documento de identidad</label>
-          <input id="step3_doc" type="text" placeholder="Ej: 80123456"
-            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
-        </div>
-        <div>
-          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Celular</label>
-          <input id="step3_cel" type="tel" placeholder="Ej: 3001234567"
-            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
-        </div>
-        <button onclick="confirmarDatos()" class="confirm-btn" style="width:100%;margin-top:8px;">
-          Ver mis exámenes →
-        </button>
-      </div>
-    </div>`;
-}
-
-function confirmarDatos() {
-  const nombre = document.getElementById('step3_nombre')?.value.trim();
-  const doc    = document.getElementById('step3_doc')?.value.trim();
-  const cel    = document.getElementById('step3_cel')?.value.trim();
-  if (!nombre || !doc || !cel) {
-    alert('Por favor completa todos los datos.');
-    return;
-  }
-  state.nombre    = nombre;
-  state.documento = doc;
-  state.celular   = cel;
-  datosEnviados = true;
-  state.step = 4;
-  render();
-}
 
 function renderResults(app) {
   const { lista, alerts } = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
