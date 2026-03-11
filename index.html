@@ -1238,6 +1238,9 @@ function renderResults(app) {
         </div>
 
         <div class="results-title">Exámenes Requeridos</div>
+        <div style="margin-bottom:10px;padding:10px;background:#f0f0f0;border-radius:8px;font-size:0.85rem;color:#555;text-align:center;" id="exams-hint">
+          📋 Envía tus datos primero, luego podrás marcar cada examen completado.
+        </div>
         <div class="exam-grid" id="exam-grid-container">${examHtml}</div>
 
         ${alertHtml}
@@ -1331,7 +1334,7 @@ function renderResults(app) {
         </div>
 
         <button class="restart-btn" onclick="restart()">↩ Nueva consulta</button>
-        <button onclick="generarPDF()" style="margin-top:10px;width:100%;padding:14px;border-radius:10px;border:2px solid #111111;background:#111111;color:#ffffff;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
+        <button id="pdf-btn" onclick="generarPDF()" style="display:none;margin-top:10px;width:100%;padding:14px;border-radius:10px;border:2px solid #111111;background:#111111;color:#ffffff;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
           📄 Descargar PDF con exámenes
         </button>
       </div>
@@ -1356,7 +1359,7 @@ function restart() {
 }
 
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzrkm2BUiULxEt-UuG9SK0SIZwUJQW4TE3tJq2XEbIcCXWTNAydzKlVI6bfXez9_AWp/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
 function enviarCita() {
   const nombre = document.getElementById('cita_nombre')?.value.trim();
@@ -1404,6 +1407,20 @@ function enviarCita() {
     `🏥 *Licencia:* ${state.licencia || '-'}\n` +
     `🎂 *Edad:* ${state.edad || '-'} años`;
 
+  datosEnviados = true;
+  const hint = document.getElementById('exams-hint');
+  if (hint) hint.style.display = 'none';
+  // Show PDF button
+  const pdfBtn = document.getElementById('pdf-btn');
+  if (pdfBtn) pdfBtn.style.display = 'block';
+  // Show confirmation that data was sent
+  const enviarBtn = document.querySelector('button[onclick="enviarCita()"]');
+  if (enviarBtn) {
+    enviarBtn.textContent = '✅ Datos enviados — ahora marca tus exámenes';
+    enviarBtn.style.background = '#111111';
+    enviarBtn.style.color = '#ffffff';
+    enviarBtn.disabled = true;
+  }
   window.open('https://wa.me/573012271729?text=' + encodeURIComponent(msg), '_blank');
 }
 
@@ -1556,8 +1573,13 @@ function generarPDF() {
 
 
 let examsChecked = {};
+let datosEnviados = false;
 
 function toggleExam(key) {
+  if (!datosEnviados) {
+    alert('Por favor completa y envía tus datos primero antes de marcar los exámenes.');
+    return;
+  }
   const item = document.getElementById('exam-' + key);
   const chk  = document.getElementById('chk-' + key);
   if (!item) return;
