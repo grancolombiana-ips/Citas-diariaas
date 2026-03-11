@@ -499,6 +499,7 @@
     <div class="step-dot" id="dot1"></div>
     <div class="step-dot" id="dot2"></div>
     <div class="step-dot" id="dot3"></div>
+    <div class="step-dot" id="dot4"></div>
   </div>
 
   <div id="app"></div>
@@ -512,6 +513,9 @@ const state = {
   licencia: null,
   primeraVez: null,
   vencido: false,
+  nombre: '',
+  documento: '',
+  celular: '',
   edad: null
 };
 
@@ -1009,7 +1013,8 @@ function render() {
   if (state.step === 0) renderStep0(app);
   else if (state.step === 1) renderStep1(app);
   else if (state.step === 2) renderStep2(app);
-  else if (state.step === 3) renderResults(app);
+  else if (state.step === 3) renderStep3(app);
+  else if (state.step === 4) renderResults(app);
 }
 
 function audioBtn(text) {
@@ -1156,6 +1161,53 @@ function confirmAge() {
 }
 
 
+function renderStep3(app) {
+  app.innerHTML = `
+    <div class="card">
+      <div class="step-label">Paso 4 de 4 — Sus Datos</div>
+      <div class="question">Ingrese sus datos personales</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Nombre completo</label>
+          <input id="step3_nombre" type="text" placeholder="Ej: Juan Pérez García"
+            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+        </div>
+        <div>
+          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Documento de identidad</label>
+          <input id="step3_doc" type="text" placeholder="Ej: 80123456"
+            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+        </div>
+        <div>
+          <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Celular</label>
+          <input id="step3_cel" type="tel" placeholder="Ej: 3001234567"
+            style="width:100%;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+            onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+        </div>
+        <button onclick="confirmarDatos()" class="confirm-btn" style="width:100%;margin-top:8px;">
+          Ver mis exámenes →
+        </button>
+      </div>
+    </div>`;
+}
+
+function confirmarDatos() {
+  const nombre = document.getElementById('step3_nombre')?.value.trim();
+  const doc    = document.getElementById('step3_doc')?.value.trim();
+  const cel    = document.getElementById('step3_cel')?.value.trim();
+  if (!nombre || !doc || !cel) {
+    alert('Por favor completa todos los datos.');
+    return;
+  }
+  state.nombre    = nombre;
+  state.documento = doc;
+  state.celular   = cel;
+  datosEnviados = true;
+  state.step = 4;
+  render();
+}
+
 function renderResults(app) {
   const { lista, alerts } = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
 
@@ -1293,49 +1345,21 @@ function renderResults(app) {
         </div>
 
         <!-- Bloque agendar cita -->
-        <div style="margin-top:20px;font-family:'Rajdhani',sans-serif;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:6px;">PASO 2</div>
-        <div style="margin-top:0px;background:rgba(0,194,224,0.05);border:1px solid rgba(0,194,224,0.2);border-radius:14px;padding:24px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px;">📅 Agendar Cita — Enviar por WhatsApp</div>
-          <p style="font-size:0.9rem;color:var(--gray);margin-bottom:18px;line-height:1.5;">Si quieres tomar cita con nosotros, envíanos los siguientes datos:</p>
-
-          <div style="display:flex;flex-direction:column;gap:14px;">
-
-            <div>
-              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Nombre completo</label>
-              <input id="cita_nombre" type="text" placeholder="Ej: Juan Pérez García"
-                style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(0,194,224,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='rgba(0,194,224,0.2)'" />
-            </div>
-
-            <div>
-              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Documento de identidad</label>
-              <input id="cita_doc" type="text" placeholder="Ej: 80123456"
-                style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(0,194,224,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='rgba(0,194,224,0.2)'" />
-            </div>
-
-            <div>
-              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Celular</label>
-              <input id="cita_cel" type="tel" placeholder="Ej: 3001234567"
-                style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(0,194,224,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='rgba(0,194,224,0.2)'" />
-            </div>
-
-            <div>
-              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;">Fecha de asistencia</label>
-              <input id="cita_fecha" type="date"
-                style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(0,194,224,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;color-scheme:dark;"
-                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='rgba(0,194,224,0.2)'" />
-            </div>
-
-            <button onclick="enviarCita()"
-              style="margin-top:4px;width:100%;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.4);color:#25d366;padding:12px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;"
-              onmouseover="this.style.background='rgba(37,211,102,0.22)'" onmouseout="this.style.background='rgba(37,211,102,0.12)'">
+        <div style="margin-top:24px;background:#f7f7f7;border:1px solid rgba(0,0,0,0.12);border-radius:14px;padding:24px;text-align:center;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#111;margin-bottom:16px;">📅 ¿Desea agendar su cita?</div>
+          <div style="display:flex;gap:12px;justify-content:center;">
+            <button onclick="agendarCita()" style="padding:12px 28px;border-radius:10px;background:#111111;color:#ffffff;border:none;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">✅ Sí, agendar</button>
+            <button onclick="noAgendar()" style="padding:12px 28px;border-radius:10px;background:#eeeeee;color:#111111;border:1px solid #ccc;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">❌ No, gracias</button>
+          </div>
+          <div id="fecha-cita-wrap" style="display:none;margin-top:16px;">
+            <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Fecha de asistencia</label>
+            <input id="cita_fecha" type="date"
+              style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+              onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            <button onclick="enviarCita()" style="margin-top:12px;width:100%;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.4);color:#25d366;padding:12px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Enviar por WhatsApp
+              Confirmar y enviar por WhatsApp
             </button>
-            
-
           </div>
         </div>
 
@@ -1357,28 +1381,39 @@ function restart() {
   state.step = 0;
   state.licencia = null;
   state.primeraVez = null;
+  state.vencido = false;
   state.edad = null;
+  state.nombre = '';
+  state.documento = '';
+  state.celular = '';
+  datosEnviados = false;
+  examsChecked = {};
   render();
 }
 
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
+
+function agendarCita() {
+  document.getElementById('fecha-cita-wrap').style.display = 'block';
+}
+
+function noAgendar() {
+  const block = document.querySelector('[onclick="agendarCita()"]')?.closest('div[style*="border-radius:14px"]');
+  if (block) block.innerHTML = '<p style="text-align:center;color:#555;font-size:0.95rem;">✅ ¡Listo! Recuerda llevar todos tus exámenes el día de la cita.</p>';
+}
+
 function enviarCita() {
-  const nombre = document.getElementById('cita_nombre')?.value.trim();
-  const doc    = document.getElementById('cita_doc')?.value.trim();
-  const cel    = document.getElementById('cita_cel')?.value.trim();
+  const nombre = state.nombre || '';
+  const doc    = state.documento || '';
+  const cel    = state.celular || '';
   const fecha  = document.getElementById('cita_fecha')?.value;
 
-  if (!nombre || !doc || !cel || !fecha) {
-    alert('Por favor completa todos los campos antes de enviar.');
+  if (!fecha) {
+    alert('Por favor selecciona una fecha de asistencia.');
     return;
   }
-
-  // Save to state for later use in toggleExam
-  state.nombrePaciente = nombre;
-  state.docPaciente = doc;
-  state.celPaciente = cel;
 
   const fechaFormateada = new Date(fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
@@ -1410,13 +1445,7 @@ function enviarCita() {
     `🏥 *Licencia:* ${state.licencia || '-'}\n` +
     `🎂 *Edad:* ${state.edad || '-'} años`;
 
-  datosEnviados = true;
-  const hint = document.getElementById('exams-hint');
-  if (hint) hint.style.display = 'none';
-  // Show PDF button
-  const pdfBtn = document.getElementById('pdf-btn');
-  if (pdfBtn) pdfBtn.style.display = 'block';
-  // Show confirmation that data was sent
+  // datosEnviados already set in confirmarDatos
   const enviarBtn = document.querySelector('button[onclick="enviarCita()"]');
   if (enviarBtn) {
     enviarBtn.textContent = '✅ Datos enviados — ahora marca tus exámenes';
@@ -1429,14 +1458,14 @@ function enviarCita() {
 
 
 function generarPDF() {
-  const nombre = document.getElementById('cita_nombre')?.value.trim() || '';
-  const doc    = document.getElementById('cita_doc')?.value.trim() || '';
-  const cel    = document.getElementById('cita_cel')?.value.trim() || '';
+  const nombre = state.nombre || '';
+  const doc    = state.documento || '';
+  const cel    = state.celular || '';
   const fecha  = document.getElementById('cita_fecha')?.value || '';
   const fechaFormateada = fecha ? new Date(fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : '-';
 
   if (!nombre || !doc) {
-    alert('Por favor completa el nombre y documento antes de generar el PDF.');
+    alert('Los datos del paciente no están disponibles.');
     return;
   }
 
@@ -1606,9 +1635,9 @@ function toggleExam(key) {
     }
 
     // Send to Google Sheets
-    const nombre = document.getElementById('cita_nombre')?.value.trim() || state.nombrePaciente || '';
-    const doc    = document.getElementById('cita_doc')?.value.trim() || state.docPaciente || '';
-    const cel    = document.getElementById('cita_cel')?.value.trim() || state.celPaciente || '';
+    const nombre = state.nombre || '';
+    const doc    = state.documento || '';
+    const cel    = state.celular || '';
     const hoy    = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
 
     if (SHEET_URL && SHEET_URL !== 'PEGA_AQUI_TU_URL') {
