@@ -337,6 +337,31 @@
   }
 
   .exam-item {
+    cursor: pointer;
+    user-select: none;
+  }
+  .exam-item.done {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+  .exam-checkbox {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    border: 2px solid #111111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: #ffffff;
+  }
+  .exam-item.done .exam-checkbox {
+    background: #111111;
+    color: #ffffff;
+  }
+  .exam-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -1153,7 +1178,8 @@ function renderResults(app) {
 
   const examHtml = lista.map((key, i) => {
     const ex = EXAMS[key];
-    return `<div class="exam-item" style="animation-delay:${i * 0.06}s">
+    return `<div class="exam-item" id="exam-${key}" style="animation-delay:${i * 0.06}s" onclick="toggleExam('${key}')">
+      <div class="exam-checkbox" id="chk-${key}"></div>
       <span class="exam-icon">${ex.icon}</span>
       <div>
         <div class="exam-name">${ex.name}</div>
@@ -1212,7 +1238,7 @@ function renderResults(app) {
         </div>
 
         <div class="results-title">Exámenes Requeridos</div>
-        <div class="exam-grid">${examHtml}</div>
+        <div class="exam-grid" id="exam-grid-container">${examHtml}</div>
 
         ${alertHtml}
 
@@ -1343,6 +1369,11 @@ function enviarCita() {
     return;
   }
 
+  // Save to state for later use in toggleExam
+  state.nombrePaciente = nombre;
+  state.docPaciente = doc;
+  state.celPaciente = cel;
+
   const fechaFormateada = new Date(fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   // 1. Guardar en Google Sheets (si ya configuraste la URL)
@@ -1430,9 +1461,9 @@ function generarPDF() {
   const pageW = 210;
 
   // Header
-  pdf.setFillColor(17, 17, 17);
+  pdf.setFillColor(230, 230, 230);
   pdf.rect(0, 0, pageW, 35, 'F');
-  pdf.setTextColor(255, 255, 255);
+  pdf.setTextColor(17, 17, 17);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
   pdf.text('GRANCOLOMBIANA IPS', margin, 14);
@@ -1484,7 +1515,11 @@ function generarPDF() {
     pdf.rect(margin, y - 4, pageW - margin*2, 8, 'F');
     pdf.setDrawColor(200, 200, 200);
     pdf.rect(margin, y - 4, pageW - margin*2, 8, 'S');
-    pdf.text((i + 1) + '.  ' + (examNames[ex] || ex), margin + 3, y + 1);
+    // Checkbox
+    pdf.setDrawColor(80, 80, 80);
+    pdf.setFillColor(255, 255, 255);
+    pdf.roundedRect(margin + 2, y - 3, 5, 5, 1, 1, 'FD');
+    pdf.text((i + 1) + '.  ' + (examNames[ex] || ex), margin + 10, y + 1);
     y += 8;
   });
 
@@ -1510,13 +1545,65 @@ function generarPDF() {
   }
 
   // Footer
-  pdf.setFillColor(17, 17, 17);
+  pdf.setFillColor(230, 230, 230);
   pdf.rect(0, 287, pageW, 10, 'F');
-  pdf.setTextColor(255, 255, 255);
+  pdf.setTextColor(17, 17, 17);
   pdf.setFontSize(7);
   pdf.text('Grancolombiana IPS · Medicina de Aviación · grancolombiana-certificacion-aeromedica.up.railway.app', margin, 293);
 
   pdf.save('Examenes-Aeromedicos-' + nombre.replace(/ /g, '-') + '.pdf');
+}
+
+
+let examsChecked = {};
+
+function toggleExam(key) {
+  const item = document.getElementById('exam-' + key);
+  const chk  = document.getElementById('chk-' + key);
+  if (!item) return;
+  const done = item.classList.toggle('done');
+  chk.textContent = done ? '✓' : '';
+  examsChecked[key] = done;
+
+  // Check if all exams are done
+  const { lista } = getExams(state.licencia, state.primeraVez, state.edad, state.vencido);
+  const allDone = lista.every(k => examsChecked[k]);
+
+  if (allDone) {
+    // Show completion message
+    const existing = document.getElementById('completado-msg');
+    if (!existing) {
+      const msg = document.createElement('div');
+      msg.id = 'completado-msg';
+      msg.style.cssText = 'margin-top:16px;padding:16px;background:#111111;color:#ffffff;border-radius:10px;text-align:center;font-family:Rajdhani,sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;';
+      msg.innerHTML = '✅ Todos los exámenes completados!<br><small style="font-weight:400;font-size:0.85rem;">Enviando registro a Google Sheets...</small>';
+      document.getElementById('exam-grid-container')?.appendChild(msg);
+    }
+
+    // Send to Google Sheets
+    const nombre = document.getElementById('cita_nombre')?.value.trim() || state.nombrePaciente || '';
+    const doc    = document.getElementById('cita_doc')?.value.trim() || state.docPaciente || '';
+    const cel    = document.getElementById('cita_cel')?.value.trim() || state.celPaciente || '';
+    const hoy    = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    if (SHEET_URL && SHEET_URL !== 'PEGA_AQUI_TU_URL') {
+      fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre:     nombre,
+          documento:  doc,
+          celular:    cel,
+          fechaCita:  hoy,
+          licencia:   state.licencia || '-',
+          edad:       state.edad || '-',
+          primeraVez: state.primeraVez,
+          estado:     'COMPLETADO'
+        })
+      }).catch(() => {});
+    }
+  }
 }
 
 // ─── Init ─────────────────────────────────────────────────
