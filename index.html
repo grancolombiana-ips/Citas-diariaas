@@ -514,135 +514,207 @@ const EXAMS = {
 function getExams(licencia, primeraVez, edad) {
   let lista = [];
   const alerts = [];
-
-  // Siempre
-  lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
-
   const lic = licencia;
   const pv = primeraVez;
   const e = edad;
 
-  // ── CLASE 1: PCA · PTL (avión, helicóptero, VTOL) ──
+  // ── CLASE 1: PCA · PTL · PCH · IDV ──
   if (lic === 'clase1') {
+    // Siempre: médico aeronáutico + paraclínicos base
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
-    if (pv || e >= 40) {
-      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma');
-    }
-    if (e >= 25 && e <= 29) lista.push('oftalmo_comp');
-    if (e >= 30 && e <= 34) lista.push('oftalmo_comp');
-    if (e >= 35) lista.push('oftalmo_comp', 'perfil');
-    if (e >= 36) lista.push('creatinina');
-    if (e >= 40) lista.push('ekg', 'perfil', 'creatinina');
-    if (e >= 50) lista.push('esfuerzo');
-    if (e >= 60) {
-      lista.push('psicologia');
-      alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
-    }
+    // Primera vez (<40 o >=40): ORL, Cardio, Neuro, Psiq, Odonto, Psicología, Rayos X
     if (pv) {
-      lista.push('rayosx');
+      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+    }
+
+    // Renovación por edad
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      // <=24: solo base
+      if (e >= 25 && e <= 29) lista.push('oftalmo_comp');
+      if (e >= 30 && e <= 34) lista.push('oftalmo_comp');
+      if (e >= 35 && e <= 35) lista.push('oftalmo_comp', 'perfil');
+      if (e >= 36 && e <= 36) lista.push('oftalmo_comp', 'perfil', 'creatinina');
+      if (e >= 37 && e <= 38) lista.push('oftalmo_comp', 'perfil', 'creatinina');
+      if (e >= 39 && e <= 39) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina');
+      if (e >= 40 && e <= 44) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 45 && e <= 49) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 50 && e <= 54) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 55 && e <= 59) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 60 && e <= 64) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+      }
+      if (e >= 65) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+        alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
+      }
     }
   }
 
-  // ── CLASE 2: PPA · PPL · APA (Pilotos privados) ──
+  // ── CLASE 2: PPA · PPL · APA · BAE · IDV · NDV ──
   if (lic === 'clase2_piloto') {
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
-    if (pv || e >= 40) {
-      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma');
-    }
-    if (e >= 40) lista.push('oftalmo_comp', 'perfil', 'creatinina', 'ekg');
-    if (e >= 45) lista.push('oftalmo_comp');
-    if (e >= 50) lista.push('esfuerzo');
-    if (e >= 55) lista.push('ekg');
-    if (e >= 60) {
-      lista.push('psicologia', 'perfil', 'creatinina', 'ekg');
-      alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
-    }
-    if (e >= 65) {
-      alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
-    }
     if (pv) {
-      lista.push('rayosx');
+      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+    }
+
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      // <=24: solo base
+      if (e >= 25 && e <= 27) lista.push('orl');
+      if (e >= 28 && e <= 29) lista.push('orl');
+      if (e >= 30 && e <= 32) lista.push('orl');
+      if (e >= 33 && e <= 34) lista.push('orl');
+      if (e >= 35 && e <= 37) lista.push('orl', 'oftalmo_comp');
+      if (e >= 38 && e <= 39) lista.push('orl', 'oftalmo_comp');
+      if (e >= 40 && e <= 44) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 45 && e <= 49) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e === 50) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 51 && e <= 54) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 55 && e <= 59) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 60 && e <= 64) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+      }
+      if (e >= 65) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+        alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
+      }
     }
   }
 
-  // ── CLASE 2: TCP — Tripulante de Cabina (vigencia 3 años) ──
+  // ── CLASE 2: TCP — Tripulante de Cabina ──
   if (lic === 'clase2_tcp') {
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
-    if (pv || e >= 40) {
-      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma');
-    }
-    if (e >= 40) lista.push('oftalmo_comp', 'perfil', 'creatinina', 'ekg');
-    if (e >= 50) lista.push('esfuerzo');
-    if (e >= 60) {
-      lista.push('psicologia');
-      alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
-    }
     if (pv) {
-      lista.push('rayosx');
+      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+    }
+
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      if (e >= 25 && e <= 29) lista.push('orl');
+      if (e >= 30 && e <= 34) lista.push('orl');
+      if (e >= 35 && e <= 39) lista.push('orl', 'oftalmo_comp');
+      if (e >= 40 && e <= 42) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 43 && e <= 47) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 48 && e <= 52) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 53 && e <= 57) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 58 && e <= 59) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 60 && e <= 64) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+      }
+      if (e >= 65) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+        alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
+      }
     }
     alerts.push({ type: 'info', text: '📋 TCP Tripulante de Cabina: vigencia fija de 36 meses (3 años).' });
   }
 
   // ── CLASE 3: CTA — Controlador de Tránsito Aéreo ──
   if (lic === 'clase3_cta') {
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
-    if (pv || e >= 40) {
-      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma');
-    }
-    if (e >= 40) lista.push('oftalmo_comp', 'perfil', 'creatinina', 'ekg');
-    if (e >= 45) lista.push('oftalmo_comp');
-    if (e >= 50) lista.push('esfuerzo');
-    if (e >= 55) lista.push('ekg');
-    if (e >= 60) {
-      lista.push('psicologia', 'perfil', 'creatinina', 'ekg');
-      alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
-    }
     if (pv) {
-      lista.push('rayosx');
+      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+    }
+
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      if (e < 24) { /* solo base */ }
+      if (e >= 24 && e <= 25) lista.push('oftalmo_comp');
+      if (e >= 26 && e <= 29) lista.push('oftalmo_comp');
+      if (e >= 30 && e <= 34) lista.push('oftalmo_comp', 'orl');
+      if (e >= 35 && e <= 39) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria');
+      if (e >= 40 && e <= 44) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 45 && e <= 49) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 50 && e <= 54) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 55 && e <= 59) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 60 && e <= 64) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+      }
+      if (e >= 65) {
+        lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg', 'psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+        alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
+      }
     }
   }
 
-  // ── CLASE 3: OEA — Operador de Estación Aeronáutica (vigencia 3 años) ──
+  // ── CLASE 3: OEA — Operador de Estación Aeronáutica ──
   if (lic === 'clase3_oea') {
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
     if (pv) {
       lista.push('orl', 'odontograma', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 ORL, Odontograma y Rayos X solo en la primera solicitud.' });
     }
-    if (e >= 40) lista.push('ekg', 'perfil', 'creatinina');
-    if (e >= 50) lista.push('esfuerzo');
+
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      if (e < 25) { /* solo base */ }
+      if (e >= 25 && e <= 29) { /* solo base */ }
+      if (e >= 30 && e <= 34) lista.push('oftalmo_comp');
+      if (e >= 35 && e <= 39) lista.push('oftalmo_comp');
+      if (e >= 40) lista.push('oftalmo_comp', 'perfil', 'creatinina', 'ekg');
+      if (e >= 50) lista.push('esfuerzo');
+    }
     alerts.push({ type: 'info', text: '📋 OEA Operador de Estación Aeronáutica: vigencia fija de 36 meses (3 años).' });
   }
 
   // ── CLASE 3: PUL — Piloto de Ultraliviano ──
   if (lic === 'clase3_pul') {
+    lista.push('medico', 'ch', 'orina', 'glicemia', 'audiometria');
     lista.push('oftalmo_aero');
 
-    if (pv || e >= 40) {
-      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma');
-    }
-    if (e >= 40) lista.push('oftalmo_comp', 'perfil', 'creatinina', 'ekg');
-    if (e >= 50) lista.push('esfuerzo');
-    if (e >= 60) {
-      lista.push('psicologia');
-      alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
-    }
     if (pv) {
-      lista.push('rayosx');
+      lista.push('orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'psicologia', 'rayosx');
+      if (e >= 40) lista.push('esfuerzo');
       alerts.push({ type: 'info', text: '📌 Rayos X de tórax solo en la primera solicitud.' });
+    }
+
+    if (!pv) {
+      if (e >= 40 && e % 5 === 0) lista.push('esfuerzo');
+      if (e < 25) { /* solo base */ }
+      if (e >= 25 && e <= 29) lista.push('orl');
+      if (e >= 30 && e <= 34) lista.push('orl');
+      if (e >= 35 && e <= 39) lista.push('orl', 'oftalmo_comp');
+      if (e >= 40) lista.push('oftalmo_comp', 'orl', 'cardiologia', 'neurologia', 'psiquiatria', 'odontograma', 'perfil', 'creatinina', 'ekg');
+      if (e >= 50) lista.push('esfuerzo');
+      if (e >= 60) {
+        lista.push('psicologia');
+        alerts.push({ type: 'warning', text: '⚠️ Psicología obligatoria cada 2 años desde los 60.' });
+      }
+      if (e >= 65) {
+        alerts.push({ type: 'warning', text: '⚠️ Desde los 65 años: todos los exámenes en cada renovación.' });
+      }
     }
   }
 
-  // Deterioro auditivo
+  // Observación general
   alerts.push({ type: 'info', text: '🔊 Si hay deterioro auditivo previo: audiometría semestral y debe anotarse en el certificado.' });
 
   // Dedup
