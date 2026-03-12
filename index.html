@@ -1372,7 +1372,7 @@ function restart() {
 }
 
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxWsu5VnKgthSLGe9yRPx6pdhBWTFBrXaxSe_I-eVHJpgfLljPURHk2-Ls3lTZfwTEb/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
 
 
@@ -1429,7 +1429,7 @@ function enviarCita() {
       licencia:   state.licencia || '-',
       edad:       state.edad     || '-',
       primeraVez: state.primeraVez,
-      examenes:   exams.map(e => e.name).join(', ')
+      examenes:   exams.map(e => (EXAMS[e] ? EXAMS[e].name : e)).join(', ')
     };
     fetch(SHEET_URL, {
       method: 'POST',
