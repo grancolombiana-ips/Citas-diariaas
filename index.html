@@ -1300,7 +1300,7 @@ function renderResults(app) {
 
             <div style="display:flex;gap:12px;align-items:flex-start;">
               <span style="font-size:1.2rem;">🗓️</span>
-              <span><b style="color:var(--white);">Horario:</b> Lunes a viernes · 6:30 a 8:30 a.m. · <span style="color:var(--cyan);">Sin cita previa</span><br><b>Recomendamos llegar lo más temprano posible, con el fin de garantizar la certificación en 4 horas el mismo día.</b></span>
+              <span><b style="color:var(--white);">Horario:</b> Lunes a viernes · 6:00 a 8:45 a.m. · <span style="color:var(--cyan);">Sin cita previa</span><br><b>Recomendamos llegar lo más temprano posible, con el fin de garantizar la certificación en 4 horas el mismo día.</b></span>
             </div>
 
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1341,7 +1341,8 @@ function renderResults(app) {
             <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Fecha de asistencia</label>
             <input id="cita_fecha" type="date"
               style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
-              onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+              onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'"
+              onchange="validarFecha(this)" />
             <button onclick="enviarCita()" style="margin-top:12px;width:100%;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.4);color:#25d366;padding:12px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
               Confirmar y enviar por WhatsApp
@@ -1378,7 +1379,7 @@ function restart() {
 }
 
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzyj1jdcpEvMxFJFZZeWR8kVsR7UOXZzKlHcUZVpc5n3tOC1USv9Uzm79naPyZgFBDI/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
 
 
@@ -1400,6 +1401,54 @@ function guardarDatosResultados() {
   // Hide form, show confirmation
   const block = document.getElementById('datos-form-block');
   if (block) block.style.display = 'none';
+}
+
+function getFestivosCol(year) {
+  // Festivos fijos
+  var fijos = [
+    year+'-01-01', year+'-05-01', year+'-07-04', year+'-07-20',
+    year+'-08-07', year+'-12-08', year+'-12-25'
+  ];
+  // Pascua (algoritmo Butcher)
+  var a=year%19, b=Math.floor(year/100), c=year%100,
+      d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25),
+      g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+      i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+      m=Math.floor((a+11*h+22*l)/451),
+      month=Math.floor((h+l-7*m+114)/31),
+      day=((h+l-7*m+114)%31)+1;
+  var pascua = new Date(year, month-1, day);
+  // Festivos movibles basados en Pascua
+  function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
+  function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  var movPascua = [
+    fmt(addDays(pascua,-3)), fmt(addDays(pascua,-2)),  // Jueves y Viernes Santo
+    fmt(addDays(pascua,39)), fmt(addDays(pascua,49)), fmt(addDays(pascua,50))
+  ];
+  // Festivos "Ley Emiliani" (se mueven al lunes siguiente)
+  function luneSig(mes,dia){
+    var d=new Date(year,mes-1,dia);
+    var dow=d.getDay();
+    if(dow!==1) d.setDate(d.getDate()+((1-dow+7)%7));
+    return fmt(d);
+  }
+  var emiliani = [
+    luneSig(1,6), luneSig(3,19), luneSig(6,29), luneSig(8,15),
+    luneSig(10,12), luneSig(11,1), luneSig(11,11)
+  ];
+  return fijos.concat(movPascua).concat(emiliani);
+}
+
+function validarFecha(input) {
+  var val = input.value;
+  if (!val) return;
+  var d = new Date(val + 'T12:00:00');
+  var dow = d.getDay(); // 0=Dom, 6=Sab
+  var festivos = getFestivosCol(d.getFullYear());
+  if (dow === 0 || dow === 6 || festivos.indexOf(val) !== -1) {
+    alert('⚠️ No se atiende ese día. Por favor seleccione un día hábil (lunes a viernes, no festivo).');
+    input.value = '';
+  }
 }
 
 function agendarCita() {
