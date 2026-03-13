@@ -1269,7 +1269,16 @@ function renderResults(app) {
                 onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
             </div>
             <div>
-              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Fecha de nacimiento</label>
+              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Número de SIGA</label>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <input type="checkbox" id="res_nosiga" onchange="toggleSiga(this)"
+                  style="width:18px;height:18px;cursor:pointer;" />
+                <label for="res_nosiga" style="font-size:0.9rem;color:#555;cursor:pointer;">No tengo número de SIGA</label>
+              </div>
+              <input id="res_siga" type="text" placeholder="Ej: 123456"
+                style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            </div>
               <input id="res_fechanac" type="date"
                 style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;color-scheme:light;"
                 onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
@@ -1396,11 +1405,29 @@ function guardarDatosResultados() {
   state.celular   = cel;
   state.fechaNac  = document.getElementById('res_fechanac')?.value || '';
   state.email     = document.getElementById('res_email')?.value.trim() || '';
+  const noSiga    = document.getElementById('res_nosiga')?.checked;
+  state.siga      = noSiga ? 'No tiene' : (document.getElementById('res_siga')?.value.trim() || '');
   datosEnviados   = true;
 
   // Hide form, show confirmation
   const block = document.getElementById('datos-form-block');
   if (block) block.style.display = 'none';
+}
+
+function toggleSiga(checkbox) {
+  const input = document.getElementById('res_siga');
+  if (checkbox.checked) {
+    input.value = '';
+    input.disabled = true;
+    input.style.background = '#f0f0f0';
+    input.style.color = '#aaa';
+    input.placeholder = 'No aplica';
+  } else {
+    input.disabled = false;
+    input.style.background = '#fff';
+    input.style.color = '#111';
+    input.placeholder = 'Ej: 123456';
+  }
 }
 
 function getFestivosCol(year) {
@@ -1482,6 +1509,7 @@ function enviarCita() {
       celular:    cel,
       email:      state.email || '',
       fechaNac:   state.fechaNac || '',
+      siga:       state.siga || '',
       fechaCita:  fechaFormateada,
       licencia:   state.licencia || '-',
       edad:       state.edad     || '-',
