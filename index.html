@@ -1269,6 +1269,12 @@ function renderResults(app) {
                 onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
             </div>
             <div>
+              <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Fecha de nacimiento</label>
+              <input id="res_fechanac" type="date"
+                style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;color-scheme:light;"
+                onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'" />
+            </div>
+            <div>
               <label style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px;">Correo electrónico</label>
               <input id="res_email" type="email" placeholder="Ej: juan@correo.com"
                 style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;color:#111;font-size:0.95rem;font-family:'Rajdhani',sans-serif;outline:none;box-sizing:border-box;"
@@ -1372,7 +1378,7 @@ function restart() {
 }
 
 // ── URL del Google Apps Script (reemplazar después de desplegar) ──
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx4xDO6FUCfkscK-0llwIj36hmK6XBI85exWbKB7IlE9g8Lr36EZaoahpSXGOVHz7aS/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxzW0i5X1Akw21h6-E5WucRCK66QnUrkzMb1drEUr08vF1WUX5qkSQlM61ZhwoPW4Z1/exec';
 
 
 
@@ -1387,6 +1393,7 @@ function guardarDatosResultados() {
   state.nombre    = nombre;
   state.documento = doc;
   state.celular   = cel;
+  state.fechaNac  = document.getElementById('res_fechanac')?.value || '';
   state.email     = document.getElementById('res_email')?.value.trim() || '';
   datosEnviados   = true;
 
@@ -1425,6 +1432,7 @@ function enviarCita() {
       documento:  doc,
       celular:    cel,
       email:      state.email || '',
+      fechaNac:   state.fechaNac || '',
       fechaCita:  fechaFormateada,
       licencia:   state.licencia || '-',
       edad:       state.edad     || '-',
