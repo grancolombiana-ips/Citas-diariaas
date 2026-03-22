@@ -1,5 +1,23 @@
-cp ~/Downloads/index\ \(32\).html ~/Downloads/granco-tarifas/public/index.html
-cd ~/Downloads/granco-tarifas
-git add .
-git commit -m "direccion mapa y whatsapp contacto"
-git push
+const SHEET_NAME = 'Hoja 1';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+    const fecha = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+    sheet.appendRow([fecha, data.correo, data.institucion]);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput('Servicio activo - Grancolombiana IPS')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
